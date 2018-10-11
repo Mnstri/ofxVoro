@@ -4,7 +4,7 @@
 
 #include "ofxVoro.h"
 
-class testApp : public ofBaseApp{
+class ofApp : public ofBaseApp{
 public:
     void setup();
     void update();
@@ -25,7 +25,7 @@ public:
     ofEasyCam   cam;
     ofLight     light;
     
-    vector<ofPoint> cellCentroids;
+    vector<glm::vec3> cellCentroids;
     vector<float>   cellRadius;
     vector<ofVboMesh>  cellMeshes;
     vector<ofVboMesh>  cellMeshWireframes;

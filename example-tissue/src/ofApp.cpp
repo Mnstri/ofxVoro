@@ -1,7 +1,7 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void testApp::setup(){
+void ofApp::setup(){
     ofEnableAlphaBlending();
     ofSetVerticalSync(true);
     ofEnableSmoothing();
@@ -12,7 +12,7 @@ void testApp::setup(){
     makeTissue(50, ofGetHeight()*0.8, ofGetHeight()*0.8, 20);
 }
 
-void testApp::makeTissue(int _nCells, int _width, int _height, int _deep){
+void ofApp::makeTissue(int _nCells, int _width, int _height, int _deep){
     
     //  Fresh begining
     //
@@ -43,7 +43,7 @@ void testApp::makeTissue(int _nCells, int _width, int _height, int _deep){
     //  Add the cell seed to the container
     //
     for(int i = 0; i < _nCells;i++){
-        ofPoint newCell = ofPoint(ofRandom(-_width*0.5,_width*0.5),
+        glm::vec3 newCell = glm::vec3(ofRandom(-_width*0.5,_width*0.5),
                                   ofRandom(-_height*0.5,_height*0.5),
                                   ofRandom(-_deep*0.25,_deep*0.25));
     
@@ -57,13 +57,13 @@ void testApp::makeTissue(int _nCells, int _width, int _height, int _deep){
 }
 
 //--------------------------------------------------------------
-void testApp::update(){
+void ofApp::update(){
 
     ofSetWindowTitle(ofToString(ofGetFrameRate()));
 }
 
 //--------------------------------------------------------------
-void testApp::draw(){
+void ofApp::draw(){
     ofBackground(255);
     
     ofPushMatrix();
@@ -96,7 +96,7 @@ void testApp::draw(){
 }
 
 //--------------------------------------------------------------
-void testApp::keyPressed(int key){
+void ofApp::keyPressed(int key){
     if ( key == 'f'){
         ofToggleFullscreen();
     } else {
@@ -105,40 +105,40 @@ void testApp::keyPressed(int key){
 }
 
 //--------------------------------------------------------------
-void testApp::keyReleased(int key){
+void ofApp::keyReleased(int key){
 
 }
 
 //--------------------------------------------------------------
-void testApp::mouseMoved(int x, int y ){
+void ofApp::mouseMoved(int x, int y ){
 
 }
 
 //--------------------------------------------------------------
-void testApp::mouseDragged(int x, int y, int button){
+void ofApp::mouseDragged(int x, int y, int button){
 
 }
 
 //--------------------------------------------------------------
-void testApp::mousePressed(int x, int y, int button){
+void ofApp::mousePressed(int x, int y, int button){
 
 }
 
 //--------------------------------------------------------------
-void testApp::mouseReleased(int x, int y, int button){
+void ofApp::mouseReleased(int x, int y, int button){
 
 }
 
 //--------------------------------------------------------------
-void testApp::windowResized(int w, int h){
+void ofApp::windowResized(int w, int h){
 }
 
 //--------------------------------------------------------------
-void testApp::gotMessage(ofMessage msg){
+void ofApp::gotMessage(ofMessage msg){
 
 }
 
 //--------------------------------------------------------------
-void testApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }

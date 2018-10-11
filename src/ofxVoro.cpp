@@ -12,17 +12,17 @@ float getCellRadius(voro::voronoicell &_c){
     return pow(3* _c.volume()/4*PI,1.0/3.0);
 }
 
-ofPoint getCellCentroid(voro::voronoicell &_c, ofPoint _pos ){
+glm::vec3 getCellCentroid(voro::voronoicell &_c, glm::vec3 _pos ){
     double x,y,z;
     _c.centroid(x,y,z);
-    return ofPoint(x,y,z)*0.5 + _pos;
+    return glm::vec3(x,y,z)*0.5 + _pos;
 }
 
-vector<ofPoint> getCellVerteces(voro::voronoicell &_c, ofPoint _pos ){
+vector<glm::vec3> getCellVerteces(voro::voronoicell &_c, glm::vec3 _pos ){
     double *ptsp=_c.pts;
-    vector<ofPoint> vertices;
+    vector<glm::vec3> vertices;
     for(int i = 0; i < _c.p; i++, ptsp+=3){
-        ofPoint newPoint;
+        glm::vec3 newPoint;
         newPoint.x = _pos.x + ptsp[0]*0.5;
         newPoint.y = _pos.y + ptsp[1]*0.5;
         newPoint.z = _pos.z + ptsp[2]*0.5;
@@ -31,7 +31,7 @@ vector<ofPoint> getCellVerteces(voro::voronoicell &_c, ofPoint _pos ){
     return vertices;
 }
 
-ofVboMesh getCellMesh(voro::voronoicell &_c, ofPoint _pos, bool bWireframe){
+ofVboMesh getCellMesh(voro::voronoicell &_c, glm::vec3 _pos, bool bWireframe){
     if( _c.p ) {
         ofVboMesh mesh;
 		getCellMesh(_c, _pos, mesh, bWireframe);
@@ -41,10 +41,10 @@ ofVboMesh getCellMesh(voro::voronoicell &_c, ofPoint _pos, bool bWireframe){
 }
 
 void getCellMesh(voro::voronoicell &_c, ofVboMesh& mesh, bool bWireframe){
-    getCellMesh(_c, ofPoint(0,0), mesh, bWireframe);
+    getCellMesh(_c, glm::vec3(0,0,0), mesh, bWireframe);
 }
 
-void getCellMesh(voro::voronoicell &_c, ofPoint _pos, ofVboMesh& _mesh, bool bWireframe){
+void getCellMesh(voro::voronoicell &_c, glm::vec3 _pos, ofVboMesh& _mesh, bool bWireframe){
     if( _c.p ) {
         
 		if( !bWireframe ) {
@@ -87,11 +87,15 @@ void getCellMesh(voro::voronoicell &_c, ofPoint _pos, ofVboMesh& _mesh, bool bWi
 			vector<ofMeshFace> faces = mesh.getUniqueFaces();
 			for (int i = 0; i < faces.size(); i++) {
 				ofMeshFace face = faces[i];
-				ofPoint a = face.getVertex(0);
-				ofPoint b = face.getVertex(1);
-				ofPoint c = face.getVertex(2);
-				
-				ofPoint normal = ((b - a).cross(c - a)).normalize() * -1.;
+				glm::vec3 a = face.getVertex(0);
+				glm::vec3 b = face.getVertex(1);
+				glm::vec3 c = face.getVertex(2);
+                
+                // not sure if this is done correctly:
+                glm::vec3 cr = glm::cross(b-a, c-a);
+                glm::vec3 normal = glm::normalize(cr)*-1;
+                
+				//glm::vec3 normal = ((b - a).cross(c - a)).normalize() * -1.;
 				
                 
 				_mesh.addVertex(a);
@@ -148,7 +152,7 @@ void getCellsFromContainer(voro::container &_con, float _wallsThikness, vector<o
             } else {
                 double *pp = _con.p[vl.ijk] + _con.ps * vl.q;
 				ofVboMesh cellMesh;
-                getCellMesh(c, ofPoint(pp[0],pp[1],pp[2])*(float)(1.0+_wallsThikness), cellMesh, bWireframe);
+                getCellMesh(c, glm::vec3(pp[0],pp[1],pp[2])*(float)(1.0+_wallsThikness), cellMesh, bWireframe);
                 cells.push_back( cellMesh );
                 i++;
             }
@@ -200,7 +204,7 @@ vector<ofVboMesh>  getCellsFromContainer(voro::container &_con, float _wallsThik
             } else {
                 if(getCellRadius(c)<_maxRadius){
                     double *pp = _con.p[vl.ijk] + _con.ps * vl.q;
-                    ofVboMesh cellMesh = getCellMesh(c, ofPoint(pp[0],pp[1],pp[2])*(float)(1.0+_wallsThikness), bWireframe);
+                    ofVboMesh cellMesh = getCellMesh(c, glm::vec3(pp[0],pp[1],pp[2])*(float)(1.0+_wallsThikness), bWireframe);
                     cells.push_back( cellMesh );
                 }
                 i++;
@@ -259,8 +263,8 @@ vector<float> getCellsRadius(voro::container &_con){
     return radius;
 }
 
-vector<ofPoint> getCellsPositions(voro::container &_con){
-    vector<ofPoint> positions;
+vector<glm::vec3> getCellsPositions(voro::container &_con){
+    vector<glm::vec3> positions;
     
     voro::c_loop_all vl( _con );
     int i = 0;
@@ -272,7 +276,7 @@ vector<ofPoint> getCellsPositions(voro::container &_con){
                 return positions;
             } else {
                 double *pp = _con.p[vl.ijk] + _con.ps * vl.q;
-                positions.push_back(ofPoint(pp[0],pp[1],pp[2]));
+                positions.push_back(glm::vec3(pp[0],pp[1],pp[2]));
                 i++;
             }
             
@@ -282,8 +286,8 @@ vector<ofPoint> getCellsPositions(voro::container &_con){
     return positions;
 }
 
-vector<ofPoint> getCellsCentroids(voro::container &_con){
-    vector<ofPoint> centroids;
+vector<glm::vec3> getCellsCentroids(voro::container &_con){
+    vector<glm::vec3> centroids;
     
     voro::c_loop_all vl( _con );
     int i = 0;
@@ -295,7 +299,7 @@ vector<ofPoint> getCellsCentroids(voro::container &_con){
                 return centroids;
             } else {
                 double *pp = _con.p[vl.ijk] + _con.ps * vl.q;
-                centroids.push_back( getCellCentroid(c) + ofPoint(pp[0],pp[1],pp[2]) );
+                centroids.push_back( getCellCentroid(c) + glm::vec3(pp[0],pp[1],pp[2]) );
                 i++;
             }
             
@@ -305,10 +309,10 @@ vector<ofPoint> getCellsCentroids(voro::container &_con){
     return centroids;
 }
 
-vector< vector<ofPoint> > getCellsVertices(voro::container &_con){
-    vector< vector<ofPoint> > cells;
+vector< vector<glm::vec3> > getCellsVertices(voro::container &_con){
+    vector< vector<glm::vec3> > cells;
     
-    ofPoint pos;
+    glm::vec3 pos;
     
     voro::c_loop_all vl( _con );
     int i = 0;
@@ -320,7 +324,7 @@ vector< vector<ofPoint> > getCellsVertices(voro::container &_con){
                 return cells;
             } else {
                 double *pp = _con.p[vl.ijk] + _con.ps * vl.q;
-                vector< ofPoint > cell = getCellVerteces(c, ofPoint(pp[0],pp[1],pp[2]) );
+                vector< glm::vec3 > cell = getCellVerteces(c, glm::vec3(pp[0],pp[1],pp[2]) );
                 cells.push_back( cell );
                 i++;
             }
@@ -334,7 +338,7 @@ vector< vector<ofPoint> > getCellsVertices(voro::container &_con){
 vector< ofPolyline > getCellsPolylines(voro::container &_con){
     vector< ofPolyline > cells;
     
-    ofPoint pos;
+    glm::vec3 pos;
     
     voro::c_loop_all vl( _con );
     
@@ -348,12 +352,12 @@ vector< ofPolyline > getCellsPolylines(voro::container &_con){
             } else {
                 
                 double *pp = _con.p[vl.ijk] + _con.ps * vl.q;
-                ofPoint pos = ofPoint(pp[0],pp[1],pp[2]);
+                glm::vec3 pos = glm::vec3(pp[0],pp[1],pp[2]);
                 
                 ofPolyline cell;
                 
                 double *ptsp= c.pts;
-                vector<ofPoint> points;
+                vector<glm::vec3> points;
                 
                 //  Index
                 //
@@ -361,7 +365,7 @@ vector< ofPolyline > getCellsPolylines(voro::container &_con){
                     for(int j = 0; j < c.nu[i]; j++) {
                         int k = c.ed[i][0];
                         
-                        ofPoint newPoint;
+                        glm::vec3 newPoint;
                         newPoint.x = pos.x + c.pts[3*k]*0.5;
                         newPoint.y = pos.y + c.pts[3*k+1]*0.5;
                         newPoint.z = pos.z + c.pts[3*k+2]*0.5;
@@ -379,11 +383,11 @@ vector< ofPolyline > getCellsPolylines(voro::container &_con){
     return cells;
 }
 
-bool insideContainer(voro::container &_con, ofPoint _pos){
+bool insideContainer(voro::container &_con, glm::vec3 _pos){
     return _con.point_inside(_pos.x, _pos.y, _pos.z);
 }
 
-void addCellSeed(voro::container &_con, ofPoint &_pnt, int _i, bool _checkInside){
+void addCellSeed(voro::container &_con, glm::vec3 &_pnt, int _i, bool _checkInside){
     if (_checkInside){
         if ( insideContainer(_con, _pnt ))
             _con.put(_i, _pnt.x, _pnt.y, _pnt.z);
@@ -392,7 +396,7 @@ void addCellSeed(voro::container &_con, ofPoint &_pnt, int _i, bool _checkInside
     }
 }
 
-void addCellSeed(voro::container &_con, ofPoint *_pnt, int _i, bool _checkInside){
+void addCellSeed(voro::container &_con, glm::vec3 *_pnt, int _i, bool _checkInside){
     if (_checkInside){
         if ( insideContainer(_con, *_pnt));
         _con.put(_i, _pnt->x, _pnt->y, _pnt->z);
@@ -401,19 +405,19 @@ void addCellSeed(voro::container &_con, ofPoint *_pnt, int _i, bool _checkInside
     }
 }
 
-void addCellsSeeds(voro::container &_con, vector<ofPoint> &_pnts, bool _checkInside){
+void addCellsSeeds(voro::container &_con, vector<glm::vec3> &_pnts, bool _checkInside){
     for (int i = 0; i < _pnts.size(); i++) {
         addCellSeed(_con, _pnts[i], i, _checkInside);
     }
 }
 
-void addCellsSeeds(voro::container &_con, vector<ofPoint*> &_pnts, bool _checkInside){
+void addCellsSeeds(voro::container &_con, vector<glm::vec3*> &_pnts, bool _checkInside){
     for (int i = 0; i < _pnts.size(); i++) {
         addCellSeed(_con, _pnts[i], i, _checkInside);
     }
 }
 
-void addCellsSeeds(voro::container &_con, ofPoint *_pnts, int _nSize, bool _checkInside){
+void addCellsSeeds(voro::container &_con, glm::vec3 *_pnts, int _nSize, bool _checkInside){
     for (int i = 0; i < _nSize; i++) {
         addCellSeed(_con, _pnts[i], i, _checkInside);
     }
